@@ -27,9 +27,9 @@ for w in words_list[:5]:
     print()
 
 # %%
-# Of course we need our start and end tokens
+# Of course we need our start and end tokens represented by '.'
 for w in words_list[:4]:
-    chrs = ['<S>'] + list(w) + ['<E>']
+    chrs = [START_END_TOKEN] + list(w) + [START_END_TOKEN]
     for ch1, ch2 in zip(chrs, chrs[1:]):
         print(ch1, ch2)
     print()
