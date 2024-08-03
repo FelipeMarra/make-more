@@ -1,5 +1,5 @@
 ################### Imports ###################
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 import os
 
 import torch
@@ -75,3 +75,29 @@ def plot_bigram_tensor(bigram_tensor:torch.Tensor, idx2char:Dict[int, str]) -> N
             plt.text(j, i, bigram_count, ha='center', va='top', color='gray')
 
     plt.axis('off')
+
+def sample_from_bigram(bigram_tensor:torch.Tensor, idx2char:Dict[int, str], num_samples:int=1) -> List[str]:
+    generator = torch.Generator().manual_seed(2147483647)
+    out = []
+
+    for _ in range(num_samples):
+        name = []
+        sample_idx = 0 # Always start from start token
+        
+        while True:
+            prob_distrib = bigram_tensor[sample_idx].float()
+            prob_distrib = prob_distrib / prob_distrib.sum()
+
+            sample_idx = torch.multinomial(prob_distrib, num_samples=1, 
+                                        replacement=True, generator=generator).item()
+            sample = idx2char[sample_idx]
+
+            # Stop generation if end token
+            if sample_idx == 0:
+                break
+
+            name.append(sample)
+
+        out.append(''.join(name))
+
+    return out

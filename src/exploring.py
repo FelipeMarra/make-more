@@ -57,3 +57,22 @@ bigram_tensor
 plot_bigram_tensor(bigram_tensor, idx2char)
 
 # %%
+# Normalize the bigram tensor for the first letter
+# to obtain it's probability distribution
+prob_distr = bigram_tensor[0].float() 
+prob_distr = prob_distr/torch.sum(prob_distr)
+prob_distr
+
+# %%
+## Sampling from the distribution
+generator = torch.Generator().manual_seed(2147483647)
+sampled_idx = torch.multinomial(prob_distr, num_samples=1, 
+                                replacement=True,generator=generator).item()
+print(sampled_idx)
+idx2char[sampled_idx]
+
+# %%
+samples = sample_from_bigram(bigram_tensor, idx2char, 10)
+samples
+
+# %%
