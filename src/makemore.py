@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 ################### Constants ###################
 PATH = os.path.join(os.path.pardir, "data/names.txt")
 N_CHARS = 27 # 26 from the alphabet + '.' that represents start and end tokens
-START_END_TOKEN = '.'
+START_TOKEN = '.'
+END_TOKEN = '.'
 
-################### Pre-processing ###################
+################### Pre-procSTART_END_TOKENessing ###################
 def read_dataset(path=PATH) -> list[str]:
     return open(path, 'r').read().splitlines()
 
@@ -19,7 +20,7 @@ def bigram_count_dict(words_list:list[str]):
     bigrams_dict = {}
 
     for w in words_list:
-        chrs = [START_END_TOKEN] + list(w) + [START_END_TOKEN]
+        chrs = [START_TOKEN] + list(w) + [END_TOKEN]
         for ch1, ch2 in zip(chrs, chrs[1:]):
             bigram = (ch1, ch2)
             bigrams_dict[bigram] = bigrams_dict.get(bigram, 0) +1
@@ -27,8 +28,8 @@ def bigram_count_dict(words_list:list[str]):
     return bigrams_dict
 
 def char2idx_idx2char(words_list:list[str]) -> Tuple[Dict[str, int], Dict[int, str]]:
+    words_list = [START_TOKEN] + words_list + [END_TOKEN]
     char_list = sorted(list(set(''.join(words_list))))
-    char_list = [START_END_TOKEN] + char_list
 
     char2idx = {c:i for i,c in enumerate(char_list)}
     idx2char = {i:c for c,i in char2idx.items()}
@@ -38,13 +39,13 @@ def char2idx_idx2char(words_list:list[str]) -> Tuple[Dict[str, int], Dict[int, s
 def bigram_count_tensor(words_list:list[str], char2idx:Dict[str, int]) -> torch.Tensor:
     """
         A matrix where each cell have the form
-            matrix[i, j] = 10
-        mening that j comes after i 10 times
+            matrix[b, a] = 10
+        mening that a comes after b 10 times
     """
     bigram_tensor = torch.zeros((N_CHARS, N_CHARS), dtype=torch.int32)
 
     for w in words_list:
-        chrs = [START_END_TOKEN] + list(w) + [START_END_TOKEN]
+        chrs = [START_TOKEN] + list(w) + [END_TOKEN]
         for ch1, ch2 in zip(chrs, chrs[1:]):
             pos1 = char2idx[ch1]
             pos2 = char2idx[ch2]
@@ -56,9 +57,9 @@ def bigram_count_tensor(words_list:list[str], char2idx:Dict[str, int]) -> torch.
 def plot_bigram_tensor(bigram_tensor:torch.Tensor, idx2char:Dict[int, str]) -> None:
     """
         Plot a matrix where each cell have the form
-            ij
+            ba
             10
-        mening that j comes after i 10 times
+        mening that a comes after b 10 times
     """
     # Diplays the array
     plt.figure(figsize=(16, 16))

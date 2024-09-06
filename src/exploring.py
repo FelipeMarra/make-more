@@ -1,5 +1,4 @@
 #%%
-# chaticie do python
 import os
 import sys 
 sys.path.append(os.path.pardir)
@@ -29,13 +28,13 @@ for w in words_list[:5]:
 # %%
 # Of course we need our start and end tokens represented by '.'
 for w in words_list[:4]:
-    chrs = [START_END_TOKEN] + list(w) + [START_END_TOKEN]
+    chrs = [START_TOKEN] + list(w) + [END_TOKEN]
     for ch1, ch2 in zip(chrs, chrs[1:]):
         print(ch1, ch2)
     print()
 
 # %%
-# Now counting our gigrams
+# Now counting our bigrams
 bigrams_dict = bigram_count_dict(words_list[:4])
 print(bigrams_dict)
 
