@@ -50,10 +50,10 @@ idx2char
 
 # %%
 bigram_tensor = bigram_count_tensor(words_list, char2idx)
-bigram_tensor
+#bigram_tensor
 
 # %%
-plot_bigram_tensor(bigram_tensor, idx2char)
+#plot_bigram_tensor(bigram_tensor, idx2char)
 
 # %%
 # Normalize the bigram tensor for the first letter
@@ -71,7 +71,15 @@ print(sampled_idx)
 idx2char[sampled_idx]
 
 # %%
-samples = sample_from_bigram(bigram_tensor, idx2char, char2idx, 10)
+probability_matrix = get_bigram_probability_matrix(bigram_tensor)
+
+samples = sample_from_bigram(probability_matrix, idx2char, char2idx, 10)
 samples
+
+# %%
+mark_my_words = ["mark", "andrej", "felipe", "andrejq"]
+some_losses = loglikelihood(mark_my_words, probability_matrix, char2idx)
+some_losses
+
 
 # %%

@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 NAMES_PATH = os.path.join(os.path.pardir, "data/names.txt")
 START_TOKEN = '.'
 END_TOKEN = '.'
+MODEL_COUNT_SMOOTH = 1 # fake count to avoid -inf log likelihood
 
-################### Pre-procSTART_END_TOKENessing ###################
+################### Pre-processing ###################
 def read_dataset(path=NAMES_PATH) -> list[str]:
     return open(path, 'r').read().splitlines()
 
@@ -77,20 +78,21 @@ def plot_bigram_tensor(bigram_tensor:torch.Tensor, idx2char:Dict[int, str]) -> N
 
     plt.axis('off')
 
+################### Modeling ###################
+
 def get_bigram_probability_matrix(bigram_tensor:torch.Tensor):
-    prob_matrix = bigram_tensor.float()
-    # /= helps not creating new memory
+    prob_matrix = (bigram_tensor + MODEL_COUNT_SMOOTH).float()
+
+    # /= helps not allocating more memory
     # keepdim=True because off broadcast 
     # https://pytorch.org/docs/stable/notes/broadcasting.html
     prob_matrix /= prob_matrix.sum(1, keepdim=True)
 
     return prob_matrix
 
-def sample_from_bigram(bigram_tensor:torch.Tensor, idx2char:Dict[int, str], char2idx:Dict[int, str], num_samples:int=1) -> List[str]:
+def sample_from_bigram(probability_matrix:torch.Tensor, idx2char:Dict[int, str], char2idx:Dict[int, str], num_samples:int=1) -> List[str]:
     generator = torch.Generator().manual_seed(2147483647)
     out = []
-
-    probability_matrix = get_bigram_probability_matrix(bigram_tensor)
 
     for _ in range(num_samples):
         name = []
@@ -112,3 +114,29 @@ def sample_from_bigram(bigram_tensor:torch.Tensor, idx2char:Dict[int, str], char
         out.append(''.join(name))
 
     return out
+
+def loglikelihood(words_list:list[str], probability_matrix:torch.Tensor, char2idx:Dict[int, str]) -> list[float]:
+    loss_list = []
+    log_likelihood = 0.0
+    n = 0
+
+    for w in words_list:
+        chrs = [START_TOKEN] + list(w) + [END_TOKEN]
+        for ch1, ch2 in zip(chrs, chrs[1:]):
+            idx1 = char2idx[ch1]
+            idx2 = char2idx[ch2]
+
+            prob = probability_matrix[idx1, idx2]
+            neg_log_prob = -prob.log()
+
+            log_likelihood += neg_log_prob
+
+            n += 1
+
+        avg_log_likelihood = (log_likelihood/n).item()
+        loss_list.append(avg_log_likelihood)
+
+        log_likelihood = 0.0
+        n = 0
+
+    return loss_list
