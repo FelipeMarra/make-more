@@ -7,13 +7,12 @@ import torch
 import matplotlib.pyplot as plt
 
 ################### Constants ###################
-PATH = os.path.join(os.path.pardir, "data/names.txt")
-N_CHARS = 27 # 26 from the alphabet + '.' that represents start and end tokens
+NAMES_PATH = os.path.join(os.path.pardir, "data/names.txt")
 START_TOKEN = '.'
 END_TOKEN = '.'
 
 ################### Pre-procSTART_END_TOKENessing ###################
-def read_dataset(path=PATH) -> list[str]:
+def read_dataset(path=NAMES_PATH) -> list[str]:
     return open(path, 'r').read().splitlines()
 
 def bigram_count_dict(words_list:list[str]):
@@ -42,7 +41,8 @@ def bigram_count_tensor(words_list:list[str], char2idx:Dict[str, int]) -> torch.
             matrix[b, a] = 10
         mening that a comes after b 10 times
     """
-    bigram_tensor = torch.zeros((N_CHARS, N_CHARS), dtype=torch.int32)
+    n_chars = len(char2idx)
+    bigram_tensor = torch.zeros((n_chars, n_chars), dtype=torch.int32)
 
     for w in words_list:
         chrs = [START_TOKEN] + list(w) + [END_TOKEN]
@@ -77,24 +77,34 @@ def plot_bigram_tensor(bigram_tensor:torch.Tensor, idx2char:Dict[int, str]) -> N
 
     plt.axis('off')
 
-def sample_from_bigram(bigram_tensor:torch.Tensor, idx2char:Dict[int, str], num_samples:int=1) -> List[str]:
+def get_bigram_probability_matrix(bigram_tensor:torch.Tensor):
+    prob_matrix = bigram_tensor.float()
+    # /= helps not creating new memory
+    # keepdim=True because off broadcast 
+    # https://pytorch.org/docs/stable/notes/broadcasting.html
+    prob_matrix /= prob_matrix.sum(1, keepdim=True)
+
+    return prob_matrix
+
+def sample_from_bigram(bigram_tensor:torch.Tensor, idx2char:Dict[int, str], char2idx:Dict[int, str], num_samples:int=1) -> List[str]:
     generator = torch.Generator().manual_seed(2147483647)
     out = []
 
+    probability_matrix = get_bigram_probability_matrix(bigram_tensor)
+
     for _ in range(num_samples):
         name = []
-        sample_idx = 0 # Always start from start token
+        sample_idx = char2idx[START_TOKEN] # Always start from start token
         
         while True:
-            prob_distrib = bigram_tensor[sample_idx].float()
-            prob_distrib = prob_distrib / prob_distrib.sum()
+            prob_distrib = probability_matrix[sample_idx]
 
             sample_idx = torch.multinomial(prob_distrib, num_samples=1, 
                                         replacement=True, generator=generator).item()
             sample = idx2char[sample_idx]
 
             # Stop generation if end token
-            if sample_idx == 0:
+            if sample_idx == char2idx[END_TOKEN]:
                 break
 
             name.append(sample)

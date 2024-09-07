@@ -71,7 +71,7 @@ print(sampled_idx)
 idx2char[sampled_idx]
 
 # %%
-samples = sample_from_bigram(bigram_tensor, idx2char, 10)
+samples = sample_from_bigram(bigram_tensor, idx2char, char2idx, 10)
 samples
 
 # %%
