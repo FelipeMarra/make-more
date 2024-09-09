@@ -7,7 +7,7 @@ import torch
 import matplotlib.pyplot as plt
 
 ################### Constants ###################
-NAMES_PATH = os.path.join(os.path.pardir, "data/names.txt")
+NAMES_PATH = "../../data/names.txt"
 START_TOKEN = '.'
 END_TOKEN = '.'
 MODEL_COUNT_SMOOTH = 1 # fake count to avoid -inf log likelihood

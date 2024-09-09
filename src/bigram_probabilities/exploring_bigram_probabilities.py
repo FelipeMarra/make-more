@@ -3,7 +3,7 @@ import os
 import sys 
 sys.path.append(os.path.pardir)
 
-from makemore import *
+from bigram_probabilities import *
 
 # %%
 words_list = read_dataset()
