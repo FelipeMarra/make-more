@@ -1,6 +1,5 @@
 ################### Imports ###################
 from typing import Dict, Tuple, List
-import os
 
 import torch
 

@@ -1,8 +1,4 @@
 #%%
-import os
-import sys 
-sys.path.append(os.path.pardir)
-
 from bigram_probabilities import *
 
 # %%
