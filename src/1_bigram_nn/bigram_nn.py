@@ -1,10 +1,7 @@
 from typing import Dict, Tuple, List
-import os
 
 import torch
 import torch.nn.functional as F
-
-import matplotlib.pyplot as plt
 
 ################### Constants ###################
 NAMES_PATH = "../../data/names.txt"
