@@ -8,7 +8,7 @@ from mlp import MLP
 mlp = MLP(verbose=False)
 
 #%%
-X, Y = mlp.get_dataset()
+X, Y = mlp.get_dataset(mlp.words_list)
 
 #%%
 X.shape, X.dtype, Y.shape, Y.dtype
@@ -46,5 +46,13 @@ plt.plot(exps, losses)
 
 # %%
 mlp.train()
+
+# %%
+# evall
+mlp.forward(mlp.X_eval, mlp.Y_eval)
+
+# %%
+# test
+mlp.forward(mlp.X_test, mlp.Y_test)
 
 # %%
