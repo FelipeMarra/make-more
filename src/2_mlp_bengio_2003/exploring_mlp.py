@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from mlp import MLP
 
 #%%
-mlp = MLP(verbose=True)
+mlp = MLP(verbose=False)
 
 #%%
 X, Y = mlp.get_dataset()
@@ -38,6 +38,11 @@ print(C[X].shape, '\n', C[X][:10, :, :])
 
 #%%
 X[13, 2], C[1], C[X][13, 2]
+
+#%%
+exps, losses = mlp.find_lr()
+
+plt.plot(exps, losses)
 
 # %%
 mlp.train()
