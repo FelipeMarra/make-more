@@ -169,3 +169,30 @@ class MLP():
 
         print('Final Train Loss', loss.item())
         return steps, losses
+
+    ################### Sample #######################################################
+    def sample(self, n_samples):
+        generator = torch.Generator('cuda').manual_seed(SEED +10)
+
+        words = []
+        for _ in range(n_samples):
+            word = []    
+            context = [self.char2idx[START_TOKEN]] * CONTEXT_SIZE
+
+            while True:
+                embeddings = self.C[torch.tensor([context])] # (BATCH_SIZE, CONTEXT_SIZE, EMBEDDING_DIMS) 
+                emb_view = embeddings.view(1, -1) # (BATCH_SIZE, CONTEXT_SIZE*EMBEDDING_DIMS)
+
+                hidden = torch.tanh(emb_view @ self.W1 + self.b1)
+
+                logits = hidden @ self.W2 + self.b2
+                probs = F.softmax(logits, dim=1)
+                ix = torch.multinomial(probs, num_samples=1, generator=generator).item()
+                context = context[1:] + [ix]
+                word.append(ix)
+
+                if ix == self.char2idx[END_TOKEN]:
+                    words.append(''.join(self.idx2char[i] for i in word))
+                    break
+
+        return words

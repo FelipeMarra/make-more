@@ -68,3 +68,5 @@ if EMBEDDING_DIMS == 2:
     plt.grid('minor')
 
 # %%
+mlp.sample(20)
+# %%
