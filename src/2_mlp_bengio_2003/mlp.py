@@ -15,14 +15,14 @@ RANDOM_SEED = 42
 
 # TODO: Scheduler?
 # First
-EPOCH_LIST = [30000, 10000]
-LR = [1e-1, 1e-2]
+EPOCH_LIST = [50000, 10000]
+LR = [10**-0.5, 1e-2]
 
 BATCH_SIZE = 512
 CONTEXT_SIZE = 3 # how many letters will be used to predict the next one
-EMBEDDING_DIMS = 2 # how many dims in our embedding space
+EMBEDDING_DIMS = 10 # how many dims in our embedding space
 
-L1_NEURONS = 300
+L1_NEURONS = 200
 
 class MLP():
     def __init__(self, verbose=False) -> None:
@@ -157,7 +157,7 @@ class MLP():
 
                 if self.verbose: print('Epoch:', epoch, 'Loss', loss.item())
                 steps += 1
-                losses.append(loss.item())
+                losses.append(loss.log10().item())
 
                 for p in self.params:
                     p.grad = None

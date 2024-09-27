@@ -42,13 +42,13 @@ X[13, 2], C[1], C[X][13, 2]
 #%%
 exps, losses = mlp.find_lr()
 
-#plt.plot(exps, losses)
+plt.plot(exps, losses)
 
 # %%
 steps, losses = mlp.train()
 
 #%%
-#plt.plot(range(steps), losses)
+plt.plot(range(steps), losses)
 
 # %%
 # evall
@@ -66,6 +66,5 @@ if EMBEDDING_DIMS == 2:
     for i in range(mlp.C.shape[0]):
         plt.text(mlp.C[i,0].item(), mlp.C[i,1].item(), mlp.idx2char[i], ha='center', va='center', color='white')
     plt.grid('minor')
-
 
 # %%
